@@ -22,7 +22,7 @@ import {
 import { CityMap, MAP_WORLD }           from "./map.js";
 import { Minimap }                       from "./minimap.js";
 import { initWeather, WeatherWidget }    from './weather.js';
-import { getStartPosition, syncURLWithPosition, interactMode } from './urlParams.js';
+import { getLocationStart, syncURLWithPosition } from './urlParams.js';
 
 // ── DOM ──────────────────────────────────────────────────────────────────────
 
@@ -50,25 +50,19 @@ scene.collisionsEnabled = true;
 
 // ── CAMERA ───────────────────────────────────────────────────────────────────
 
-// URL params override config defaults
-const { position: startPosition, yaw: startYaw, pitch: startPitch, fromURL } = getStartPosition(
+// locationid URL param overrides config defaults
+const { position: startPosition, yaw: startYaw, pitch: startPitch, locationObj } = getLocationStart(
     CAMERA_START_CELL_X,
     CAMERA_START_CELL_Z,
     CAMERA_HEIGHT
 );
 
-if (fromURL) {
-    console.log(`[URL] Spawning at x=${startPosition.x.toFixed(1)} y=${startPosition.y.toFixed(1)} z=${startPosition.z.toFixed(1)} yaw=${startYaw.toFixed(3)}`);
-}
-
 const camera = new BABYLON.UniversalCamera("cam", startPosition, scene);
 
-// Apply yaw and pitch from URL, or default look-ahead (+Z / north)
 camera.rotation.y = startYaw;
-camera.rotation.x = startPitch; // positive = look down, negative = look up
+camera.rotation.x = startPitch;
 
-
-if (!fromURL) {
+if (!locationObj) {
     camera.setTarget(new BABYLON.Vector3(
         startPosition.x,
         startPosition.y,
@@ -168,7 +162,7 @@ let nearbyMesh      = null;
 let prevNearbyMesh  = null;
 let popupOpen       = false;
 let labelEnabled    = false;
-let autoOpenEnabled = interactMode; // true on load when interact=true; toggled by user actions
+let autoOpenEnabled = !!locationObj; // true on load when a locationid was matched
 
 function openPopup(metadata) {
     popupTitle.textContent = metadata.objectName ?? "Object";
@@ -254,7 +248,7 @@ scene.onBeforeRenderObservable.add(() => {
         interactHint.textContent = `[${INTERACTION_KEY}] Interact with ${name}`;
         interactHint.classList.add("visible");
 
-        if (interactMode && autoOpenEnabled && nearbyMesh !== prevNearbyMesh) {
+        if (autoOpenEnabled && nearbyMesh !== prevNearbyMesh) {
             autoOpenEnabled = false;
             openPopup(nearbyMesh.metadata);
         }
@@ -291,7 +285,7 @@ window.addEventListener("keydown", (e) => {
 engine.runRenderLoop(() => {
     scene.render();
     minimap.update(camera.position);
-    syncURLWithPosition(camera.position.x, camera.position.z); // keep URL in sync
+    syncURLWithPosition(camera);
 });
 
 window.addEventListener("resize", () => engine.resize());
