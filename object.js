@@ -31,7 +31,8 @@ export function createObject(def, scene) {
                     m.isPickable = true;  // all meshes pickable for label ray
                     m.metadata = {
                         ...(m.metadata || {}),
-                        objectName:  def.name,
+                        locationid:  def.locationid ?? null,
+                        objectName:  def.name ?? def.locationid ?? "",
                         interactive: def.interactive === true,
                         description: def.description ?? "",
                         urls:        def.urls ?? []

@@ -22,12 +22,26 @@
     <div id="interaction-popup" role="dialog" aria-modal="true" aria-labelledby="popup-title">
         <div id="popup-inner">
             <button id="popup-close" aria-label="Close">&times;</button>
-            <h2 id="popup-title"></h2>
-            <p  id="popup-description"></p>
-            <ul id="popup-links"></ul>
+            <div id="popup-header">
+                <h2 id="popup-title"></h2>
+            </div>
+            <div id="popup-body">
+                <div id="popup-tags"></div>
+                <p id="popup-description"></p>
+                <div id="popup-illustrations"></div>
+                <div id="popup-solutions" class="popup-section">
+                    <h3 class="popup-section-title">Solutions</h3>
+                    <ul id="popup-solutions-list"></ul>
+                </div>
+                <div id="popup-articles" class="popup-section">
+                    <h3 class="popup-section-title">Articles</h3>
+                    <ul id="popup-articles-list"></ul>
+                </div>
+                <ul id="popup-links"></ul>
+            </div>
         </div>
     </div>
-
+    
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
     <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>

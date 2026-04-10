@@ -1,6 +1,10 @@
 // main.js
 
-import {
+const _configFile = new URLSearchParams(location.search).get("env") === "local"
+    ? "./config.local.js"
+    : "./config.js";
+
+const {
     CELL_SIZE,
     GRAVITY, FOG_MODE,
     FOG_START, FOG_END, FOG_COLOR, CLEAR_COLOR,
@@ -16,8 +20,10 @@ import {
     INTERACTION_KEY,
     INTERACTION_KEY_CODE,
     LABEL_TOGGLE_KEY,
-    LABEL_TOGGLE_KEY_CODE
-} from "./config.js";
+    LABEL_TOGGLE_KEY_CODE,
+    LOCATIONS_API_URL,
+    PRACTICITYCONTENT_BASEURL
+} = await import(_configFile);
 
 import { CityMap, MAP_WORLD }           from "./map.js";
 import { Minimap }                       from "./minimap.js";
@@ -26,14 +32,34 @@ import { getLocationStart, syncURLWithPosition } from './urlParams.js';
 
 // ── DOM ──────────────────────────────────────────────────────────────────────
 
-const canvas       = document.getElementById("renderCanvas");
-const objectLabel  = document.getElementById("object-label");
-const popup        = document.getElementById("interaction-popup");
-const popupTitle   = document.getElementById("popup-title");
-const popupDesc    = document.getElementById("popup-description");
-const popupLinks   = document.getElementById("popup-links");
-const popupClose   = document.getElementById("popup-close");
-const interactHint = document.getElementById("interact-hint");
+const canvas              = document.getElementById("renderCanvas");
+const objectLabel         = document.getElementById("object-label");
+const popup               = document.getElementById("interaction-popup");
+const popupTitle          = document.getElementById("popup-title");
+const popupTags           = document.getElementById("popup-tags");
+const popupDesc           = document.getElementById("popup-description");
+const popupIllustrations  = document.getElementById("popup-illustrations");
+const popupSolutions      = document.getElementById("popup-solutions");
+const popupSolutionsList  = document.getElementById("popup-solutions-list");
+const popupArticles       = document.getElementById("popup-articles");
+const popupArticlesList   = document.getElementById("popup-articles-list");
+const popupLinks          = document.getElementById("popup-links");
+const popupClose          = document.getElementById("popup-close");
+const interactHint        = document.getElementById("interact-hint");
+
+// ── LOCATIONS DATA ────────────────────────────────────────────────────────────
+
+const locationsMap = new Map();
+
+const locationsReady = fetch(LOCATIONS_API_URL)
+    .then(res => res.json())
+    .then(data => {
+        const list = Array.isArray(data) ? data : Object.values(data);
+        list.forEach(loc => {
+            if (loc.locationid) locationsMap.set(loc.locationid, loc);
+        });
+    })
+    .catch(err => console.warn("Could not load locations data:", err));
 
 // ── ENGINE & SCENE ───────────────────────────────────────────────────────────
 
@@ -156,33 +182,108 @@ window.addEventListener("keydown", (e) => {
 const minimap       = new Minimap("minimapCanvas", scene, camera);
 const weatherWidget = new WeatherWidget("weatherCanvas");
 
-// ── INTERACTION SYSTEM ───────────────────────────────────────────────────────
+// ── INTERACTION POPUP ───────────────────────────────────────────────────────
 
 let nearbyMesh      = null;
 let prevNearbyMesh  = null;
 let popupOpen       = false;
 let labelEnabled    = false;
-let autoOpenEnabled = !!locationObj; // true on load when a locationid was matched
+let autoOpenEnabled = new URLSearchParams(window.location.search).get("popautoopen") === "true";
 
-function openPopup(metadata) {
-    popupTitle.textContent = metadata.objectName ?? "Object";
+// Resolve a URL from the API: prefix relative paths with the content base URL
+function contentUrl(path) {
+    if (!path) return null;
+    try {
+        const u = new URL(path);
+        return `${PRACTICITYCONTENT_BASEURL}${u.pathname}${u.search}${u.hash}`;
+    } catch {
+        // relative path
+        return `${PRACTICITYCONTENT_BASEURL}${path}`;
+    }
+}
 
-    popupDesc.textContent   = metadata.description ?? "";
-    popupDesc.style.display = metadata.description ? "block" : "none";
+async function openPopup(metadata) {
+    await locationsReady;
 
-    popupLinks.innerHTML = "";
-    const urls = metadata.urls ?? [];
-    urls.forEach(url => {
+    // Resolve data: prefer remote location record, fall back to inline metadata
+    const loc = metadata.locationid ? (locationsMap.get(metadata.locationid) ?? {}) : {};
+
+    const name         = loc.name        ?? metadata.objectName ?? "Object";
+    const description  = loc.description ?? metadata.description ?? "";
+    const tags         = loc.tags        ?? [];
+    const screenshots  = [loc.screenshot1, loc.screenshot2].map(contentUrl).filter(Boolean);
+    const solutions    = loc.solutions   ?? [];
+    const articles     = loc.articles    ?? [];
+    const locationUrl  = contentUrl(loc.url);
+
+    // Title
+    if (locationUrl) {
+        popupTitle.innerHTML = "";
+        const a = document.createElement("a");
+        a.href        = locationUrl;
+        a.textContent = name;
+        a.target      = "_blank";
+        a.rel         = "noopener noreferrer";
+        popupTitle.appendChild(a);
+    } else {
+        popupTitle.textContent = name;
+    }
+
+    // Tags
+    popupTags.innerHTML = "";
+    tags.forEach(tag => {
+        const span = document.createElement("span");
+        span.className   = "popup-tag";
+        span.textContent = tag;
+        popupTags.appendChild(span);
+    });
+    popupTags.style.display = tags.length ? "flex" : "none";
+
+    // Description
+    popupDesc.textContent   = description;
+    popupDesc.style.display = description ? "block" : "none";
+
+    // Illustrations (screenshot1 / screenshot2)
+    popupIllustrations.innerHTML = "";
+    screenshots.forEach(src => {
+        const img = document.createElement("img");
+        img.src       = src;
+        img.className = "popup-illustration";
+        img.alt       = name;
+        img.loading   = "lazy";
+        popupIllustrations.appendChild(img);
+    });
+    popupIllustrations.style.display = screenshots.length ? "flex" : "none";
+
+    // Solutions
+    popupSolutionsList.innerHTML = "";
+    solutions.forEach(s => {
         const li = document.createElement("li");
         const a  = document.createElement("a");
-        a.href        = url;
-        a.textContent = url;
+        a.href        = contentUrl(s.url);
+        a.textContent = s.title ?? s.url;
         a.target      = "_blank";
         a.rel         = "noopener noreferrer";
         li.appendChild(a);
-        popupLinks.appendChild(li);
+        popupSolutionsList.appendChild(li);
     });
-    popupLinks.style.display = urls.length ? "block" : "none";
+    popupSolutions.style.display = solutions.length ? "flex" : "none";
+
+    // Articles
+    popupArticlesList.innerHTML = "";
+    articles.forEach(article => {
+        const li = document.createElement("li");
+        const a  = document.createElement("a");
+        a.href        = contentUrl(article.url);
+        a.textContent = article.title ?? article.url;
+        a.target      = "_blank";
+        a.rel         = "noopener noreferrer";
+        li.appendChild(a);
+        popupArticlesList.appendChild(li);
+    });
+    popupArticles.style.display = articles.length ? "flex" : "none";
+
+    popupLinks.style.display = "none";
 
     popup.classList.add("visible");
     popupOpen = true;
@@ -244,7 +345,9 @@ scene.onBeforeRenderObservable.add(() => {
 
     if (hit.hit && hit.pickedMesh && hit.distance <= INTERACTION_MAX_DISTANCE) {
         nearbyMesh = hit.pickedMesh;
-        const name = hit.pickedMesh.metadata?.objectName ?? "object";
+        const meta = hit.pickedMesh.metadata ?? {};
+        const locData = meta.locationid ? locationsMap.get(meta.locationid) : null;
+        const name = locData?.name ?? meta.objectName ?? "object";
         interactHint.textContent = `[${INTERACTION_KEY}] Interact with ${name}`;
         interactHint.classList.add("visible");
 
