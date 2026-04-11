@@ -21,7 +21,7 @@ export function createObject(def, scene) {
     positions.forEach(({ x, y }) => {
         BABYLON.SceneLoader.ImportMesh(
             "",
-            "assets/",
+            "public/assets/",
             def.model,
             scene,
             (meshes) => {
