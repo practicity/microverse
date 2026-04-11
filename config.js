@@ -1,7 +1,7 @@
 // config.js  —  production
 
 // ── CONTENT SERVER ────────────────────────────────────────────────────────────
-export const PRACTICITYCONTENT_BASEURL  = "http://practi.city";
+export const PRACTICITYCONTENT_BASEURL  = "https://practi.city";
 export const LOCATIONS_API_URL          = `${PRACTICITYCONTENT_BASEURL}/api/locations.json`;
 
 // ── GRID / MAP ────────────────────────────────────────────────────────────────
