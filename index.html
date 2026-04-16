@@ -7,12 +7,31 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="loading-screen">
+        <div id="loading-content">
+            <div id="loading-title">Loading PractiCity Microverse</div>
+            <div id="loading-bar-track">
+                <div id="loading-bar"></div>
+            </div>
+            <div id="loading-pct">0%</div>
+        </div>
+    </div>
+
     <canvas id="renderCanvas" tabindex="0"></canvas>
     <canvas id="weatherCanvas" width="160" height="120"></canvas>
     <canvas id="minimapCanvas" width="200" height="200"></canvas>
 
     <div id="crosshair">+</div>
     <div id="ui">ZQSD or Arrows = Move &nbsp;|&nbsp; SPACE & LSHIFT = Go UP & DOWN &nbsp;|&nbsp; ESC = Unlock</div>
+
+    <div id="locator">
+        <div id="locator-header">
+            <div id="locator-object-name"></div>
+            <div id="locator-model-name"></div>
+        </div>
+        <pre id="locator-coords"></pre>
+        <button id="locator-copy">COPY</button>
+    </div>
 
     <div id="object-label"></div>
 

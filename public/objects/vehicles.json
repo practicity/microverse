@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Police Car",
+        "model": "vehicles/vehicle_police.glb",
+        "mapY": 0.5,
+        "mapX": 2.5,
+        "mapZ": 0,
+        "rotationY": 3.141593,
+        "scale": 0.1,
+        "highlight": true
+    }
+]

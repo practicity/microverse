@@ -1,1 +1,3 @@
-/logic/_config.local.js
+*.blend
+*.blend1
+dist/

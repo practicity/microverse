@@ -1,45 +1,46 @@
 // urlParams.js
 
-import { OBJECT_DEFINITIONS } from '../public/objects/objects.js';
+const _objectModules = import.meta.glob("../public/objects/*.json", { eager: true });
+const OBJECT_DEFINITIONS = Object.values(_objectModules).flatMap(mod => mod.default ?? mod);
+
+function cameraFromDef(obj) {
+    // cameraStartX = forward/back (→ Babylon Z)
+    // cameraStartY = right/left   (→ Babylon X)
+    // cameraStartZ = height       (→ Babylon Y)
+    return {
+        position: new BABYLON.Vector3(
+            obj.cameraStartY ?? 0,
+            obj.cameraStartZ ?? 0.175,
+            obj.cameraStartX ?? 0
+        ),
+        yaw:         obj.cameraStartYaw   ?? 0,
+        pitch:       obj.cameraStartPitch ?? 0,
+        locationObj: obj,
+    };
+}
 
 /**
- * Reads ?locationid=XXX, finds the matching object in OBJECT_DEFINITIONS,
- * and returns the camera start state for it.
+ * Reads ?locationid=XXX from the URL.
+ * Falls back to the CAMERA_DEFAULT object from config if not found.
  */
-export function getLocationStart(defaultCellX, defaultCellZ, defaultHeight) {
+export function getLocationStart(defaults) {
     const params     = new URLSearchParams(window.location.search);
     const locationid = params.get('locationid');
 
-    console.log(`[URL] locationid param: "${locationid}", OBJECT_DEFINITIONS loaded: ${OBJECT_DEFINITIONS?.length} entries`);
-
-    const defaultPos    = new BABYLON.Vector3(defaultCellX + 0.5, defaultHeight, defaultCellZ);
-    const defaultResult = { position: defaultPos, yaw: 0, pitch: 0, locationObj: null };
-
     if (!locationid) {
         console.log('[URL] No locationid — using default camera position');
-        return defaultResult;
+        return { ...cameraFromDef(defaults), locationObj: null };
     }
 
-    const obj = OBJECT_DEFINITIONS.find(o => o.locationid === locationid);
+    const locationidUpper = locationid.toUpperCase();
+    const obj = OBJECT_DEFINITIONS.find(o => o.locationid?.toUpperCase() === locationidUpper);
     if (!obj) {
-        console.warn(`[URL] locationid "${locationid}" not found in OBJECT_DEFINITIONS — using default`);
-        return defaultResult;
+        console.warn(`[URL] locationid "${locationid}" not found — using default`);
+        return { ...cameraFromDef(defaults), locationObj: null };
     }
 
-    // Axis convention mirrors object.js: cameraStartX=BabylonX, cameraStartY=BabylonZ, cameraStartZ=BabylonY(height)
-    const pos = new BABYLON.Vector3(
-        obj.cameraStartX ?? (defaultCellX + 0.5),
-        obj.cameraStartZ ?? defaultHeight,
-        obj.cameraStartY ?? defaultCellZ
-    );
-    console.log(`[URL] locationid "${locationid}" → camera at X=${pos.x} Y=${pos.y} Z=${pos.z}, yaw=${obj.cameraStartYaw ?? 0}`);
-
-    return {
-        position:    pos,
-        yaw:         obj.cameraStartYaw   ?? 0,
-        pitch:       obj.cameraStartPitch ?? 0,
-        locationObj: obj
-    };
+    console.log(`[URL] locationid "${locationid}" → cameraStartX=${obj.cameraStartX} Y=${obj.cameraStartY} Z=${obj.cameraStartZ}`);
+    return cameraFromDef(obj);
 }
 
 // Position is no longer synced to the URL; locationid param is preserved as-is.

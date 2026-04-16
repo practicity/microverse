@@ -1,16 +1,19 @@
-import { CELL_SIZE } from './config.js';
+function resolveAngle(val) {
+    if (typeof val !== 'string') return val ?? 0;
+    return new Function(`return ${val.replace(/Math\.PI/g, '3.141592653589793')}`)();
+}
 
-export function createObject(def, scene) {
+export function createObject(def, scene, onLoaded) {
 
     const positions = [];
 
-    const xStart = def.mapXFrom ?? def.mapX;
-    const xEnd   = def.mapXTo   ?? def.mapX;
-    const yStart = def.mapYFrom ?? def.mapY;
-    const yEnd   = def.mapYTo   ?? def.mapY;
+    const xStart = def.mapYFrom ?? def.mapY;
+    const xEnd   = def.mapYTo   ?? def.mapY;
+    const yStart = def.mapXFrom ?? def.mapX;
+    const yEnd   = def.mapXTo   ?? def.mapX;
 
-    const xStep = def.stepX ?? 1;
-    const yStep = def.stepY ?? 1;
+    const xStep = def.stepY ?? 1;
+    const yStep = def.stepX ?? 1;
 
     for (let x = xStart; x <= xEnd; x += xStep) {
         for (let y = yStart; y <= yEnd; y += yStep) {
@@ -18,11 +21,15 @@ export function createObject(def, scene) {
         }
     }
 
-    positions.forEach(({ x, y }) => {
+    let remaining = positions.length;
+
+    const FALLBACK_MODEL = "infrastructures/constructionsite.glb";
+
+    function loadMesh(model, x, y) {
         BABYLON.SceneLoader.ImportMesh(
             "",
             "assets/",
-            def.model,
+            model,
             scene,
             (meshes) => {
                 const root = new BABYLON.TransformNode(`${def.name}_${x}_${y}`, scene);
@@ -33,25 +40,37 @@ export function createObject(def, scene) {
                         ...(m.metadata || {}),
                         locationid:  def.locationid ?? null,
                         objectName:  def.name ?? def.locationid ?? "",
+                        model:       def.model ?? "",
                         interactive: def.interactive === true,
                         description: def.description ?? "",
                         urls:        def.urls ?? []
                     };
                 });
 
-                root.position.set(
-                    x * CELL_SIZE + CELL_SIZE / 2,
-                    def.mapZ ?? 0,
-                    y * CELL_SIZE + CELL_SIZE / 2
-                );
+                // mapX/mapY/mapZ are direct world coords: X=right, Y=forward(→Z), Z=height(→Y)
+                root.position.set(x, def.mapZ ?? 0, y);
 
-                root.rotation.x = def.rotationX ?? 0;
-                root.rotation.y = def.rotationY ?? 0;
-                root.rotation.z = def.rotationZ ?? 0;
+                root.rotation.x = resolveAngle(def.rotationX);
+                root.rotation.y = resolveAngle(def.rotationY);
+                root.rotation.z = resolveAngle(def.rotationZ);
 
                 const s = def.scale ?? 1;
                 root.scaling.set(s, s, s);
+
+                if (--remaining === 0 && onLoaded) onLoaded();
+            },
+            null,
+            (_scene, message) => {
+                if (model !== FALLBACK_MODEL) {
+                    console.warn(`[object] Failed to load "${model}" — using fallback. ${message}`);
+                    loadMesh(FALLBACK_MODEL, x, y);
+                } else {
+                    console.error(`[object] Fallback model "${FALLBACK_MODEL}" also failed. ${message}`);
+                    if (--remaining === 0 && onLoaded) onLoaded();
+                }
             }
         );
-    });
+    }
+
+    positions.forEach(({ x, y }) => loadMesh(def.model, x, y));
 }

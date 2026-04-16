@@ -1,0 +1,360 @@
+[
+
+    {
+        "locationid": "13THFL",
+        "model": "buildings/cube.glb",
+        "interactive": true,
+        "mapY": -34.5, "mapX": 32.5, "mapZ": 0.285,
+        "rotationY": 3.141593,
+        "rotationX": 1.570796,
+        "scale": 0.3,
+        "cameraStartY": -35,
+        "cameraStartZ": 2,
+        "cameraStartX": 29,
+        "cameraStartPitch": 0.5,
+        "cameraStartYaw": 0
+    },
+
+    {
+        "locationid": "ARTWATC",
+        "model": "buildings/tmp_artwatc.glb",
+        "interactive": true,
+        "mapY": 35.5, 
+        "mapX": 35.5,
+        "mapZ": 2.48,
+        "rotationY": 3.141593,
+        "rotationX": 1.570796,
+        "rotationZ": 3.141593,
+        "scale": 0.04,
+        "cameraStartY": 39.1,
+        "cameraStartZ": 3.935,
+        "cameraStartX": 38.669,
+        "cameraStartPitch": -0.457,
+        "cameraStartYaw": -5.442
+    },
+
+    {
+        "locationid": "ARTWAPT",
+        "model": "buildings/tmp_artwapt.glb",
+        "interactive": true,
+        "mapX": 46.5,
+        "mapY": 17,
+        "mapZ": -0.23,
+        "rotationY": 4.712389,
+        "rotationX": 3.141593,
+        "rotationZ": 3.141593,
+        "scale": 1.8,
+        "cameraStartY": -9.66,
+        "cameraStartZ": 8.396,
+        "cameraStartX": 44.89,
+        "cameraStartPitch": -0.347,
+        "cameraStartYaw": 5.047
+    },
+
+
+    {
+        "locationid": "COURT",
+        "model": "buildings/court.glb",
+        "interactive": true,
+        "mapX": -1,
+        "mapY": -4, 
+        "mapZ": 0,
+        "scale": 1,
+        "cameraStartX": -0.09,
+        "cameraStartY": -4.221,
+        "cameraStartZ": 0.457,
+        "cameraStartPitch": 0.043,
+        "cameraStartYaw": -0.765
+    },
+
+    {
+        "locationid": "CITYHALL",
+        "model": "buildings/cityhall.glb",
+        "interactive": true,
+        "mapX": -1,
+        "mapY": 0,
+        "mapZ": 0,
+        "scale": 1,
+        "cameraStartX": 0.188,
+        "cameraStartY": -0.596,
+        "cameraStartZ": 2.454,
+        "cameraStartPitch": -0.84,
+        "cameraStartYaw": 5.71
+    },
+
+    {
+        "locationid": "CINEMATRIX",
+        "model": "buildings/cinematrix.glb",
+        "interactive": true,
+        "mapX": -1,
+        "mapY": 4,
+        "mapZ": 0,
+        "scale": 1,
+        "cameraStartX": 1.089,
+        "cameraStartY": 2.061,
+        "cameraStartZ": 1.683,
+        "cameraStartPitch": -0.278,
+        "cameraStartYaw": 5.65
+    },
+
+
+    {
+        "locationid": "DEBRIEF",
+        "model": "buildings/debrief.glb",
+        "interactive": true,
+        "rotationY": "Math.PI * 0.5",
+        "scale": 1,
+        "mapX": 3,
+        "mapY": -1,
+        "mapZ": 0,
+        "cameraStartX": 3.391,
+        "cameraStartY": 0.455,
+        "cameraStartZ": 0.995,
+        "cameraStartPitch": -0.102,
+        "cameraStartYaw": 7.129
+    },
+
+    {
+        "locationid": "DEWEY",
+        "model": "buildings/dewey.glb",
+        "interactive": true,
+        "rotationY": "Math.PI * 0.5",
+        "scale": 1,
+        "mapX": -3, 
+        "mapY": -1,
+        "mapZ": 0,
+        "cameraStartX": -7.991,
+        "cameraStartY": 0.197,
+        "cameraStartZ": 1.338,
+        "cameraStartPitch": -0.187,
+        "cameraStartYaw": 2.308
+    },
+
+    {
+        "locationid": "DGHOSP",
+        "model": "buildings/dghosp.glb",
+        "interactive": true,
+        "rotationY": "Math.PI * 1.5",
+        "scale": 1,
+        "mapX": -17, 
+        "mapY": 0,
+        "mapZ": 0,
+        "cameraStartX": -12.601,
+        "cameraStartY": -1.677,
+        "cameraStartZ": 1.725,
+        "cameraStartPitch": -0.335,
+        "cameraStartYaw": -0.97
+    },
+
+
+
+    {
+        "locationid": "DERRICK",
+        "model": "buildings/derrick.glb",
+        "interactive": true,
+        "rotationY": "Math.PI",
+        "scale": 1,
+        "highlight": true,
+        "mapX": -48,
+        "mapY": 46,
+        "mapZ": 0,
+        "cameraStartX": -41.479,
+        "cameraStartY": 41.212,
+        "cameraStartZ": 7.43,
+        "cameraStartPitch": -0.414,
+        "cameraStartYaw": -7.039
+    },
+
+
+    {
+        "locationid": "ENDER",
+        "model": "buildings/ender.glb",
+        "interactive": true,
+        "rotationY": 6.283185,
+        "scale": 1,
+        "highlight": true,
+        "mapX": 20,
+        "mapY": 15,
+        "mapZ": 0.0,
+        "cameraStartY": 16.769,
+        "cameraStartZ": 0.882,
+        "cameraStartX": 21.176,
+        "cameraStartPitch": -0.26,
+        "cameraStartYaw": 0.688
+    },
+
+
+    {
+        "locationid": "ERICSSON",
+        "model": "buildings/ericsson.glb",
+        "interactive": true,
+        "rotationY": "Math.PI",
+        "scale": 1,
+        "mapX": 0, 
+        "mapY": 2,
+        "mapZ": 0,
+        "cameraStartX": -0.955,
+        "cameraStartY": 2.112,
+        "cameraStartZ": 0.79,
+        "cameraStartPitch": -0.258,
+        "cameraStartYaw": -3.723
+    },
+
+
+    {
+        "locationid": "FINSIM",
+        "model": "buildings/finsim.glb",
+        "interactive": true,
+        "rotationY": "Math.PI *1.5",
+        "scale": 1,
+        "highlight": true,
+        "mapX": 3,
+        "mapY": 0,
+        "mapZ": 0.0,
+        "cameraStartX": 6.554,
+        "cameraStartY": -1.704,
+        "cameraStartZ": 1.421,
+        "cameraStartPitch": -0.272,
+        "cameraStartYaw": 5.423
+    },
+
+    {
+        "locationid": "FIREST",
+        "model": "buildings/firest.glb",
+        "interactive": true,
+        "rotationY": "Math.PI / 2 ",
+        "scale": 1,
+        "highlight": true,
+        "mapX": 20,
+        "mapY": -1,  
+        "mapZ": 0.0,
+        "cameraStartX": 15.766,
+        "cameraStartY": 0.711,
+        "cameraStartZ": 1.859,
+        "cameraStartPitch": -0.277,
+        "cameraStartYaw": -16.737
+    },
+
+    {
+        "locationid": "HSNPP",
+        "model": "buildings/hsnpp.glb",
+        "interactive": true,
+        "rotationY": "Math.PI /2",
+        "scale": 1,
+        "highlight": true,  
+        "mapX": -43,
+        "mapY": -46.5,  
+        "mapZ": 0.1,
+        "cameraStartX": -35.879,
+        "cameraStartY": -32.907,
+        "cameraStartZ": 6.328,
+        "cameraStartPitch": -0.531,
+        "cameraStartYaw": -17.918
+    },
+
+    {
+        "locationid": "KEMSYM",
+        "model": "buildings/kemsym.glb",
+        "interactive": true,
+        "rotationY": "Math.PI",
+        "scale": 1,
+        "highlight": true,  
+        "mapX": 21,
+        "mapY": 15,  
+        "mapZ": 0,
+        "cameraStartX": 20.142,
+        "cameraStartY": 15.008,
+        "cameraStartZ": 0.662,
+        "cameraStartPitch": -0.176,
+        "cameraStartYaw": -10.182
+    },
+
+    {
+        "locationid": "KOLB",
+        "model": "buildings/kolb.glb",
+        "interactive": true,
+        "rotationY": "Math.PI",
+        "scale": 1,
+        "highlight": true,  
+        "mapX": -3,
+        "mapY": 3,
+        "mapZ": 0,
+        "cameraStartX": 0.663,
+        "cameraStartY": 3.023,
+        "cameraStartZ": 0.941,
+        "cameraStartPitch": -0.217,
+        "cameraStartYaw": -18.431
+    },
+
+    {
+        "locationid": "MURPHY",
+        "model": "buildings/murphy.glb",
+        "interactive": true,
+        "rotationY": "Math.PI",
+        "scale": 1,
+        "highlight": true,  
+        "mapX": 25,
+        "mapY": -42,
+        "mapZ": 0,
+        "cameraStartX": 25.655,
+        "cameraStartY": -51.975,
+        "cameraStartZ": 4.489,
+        "cameraStartPitch": -0.626,
+        "cameraStartYaw": -14.128
+    },
+
+
+    {
+        "locationid": "PANSIM",
+        "model": "buildings/pansim.glb",
+        "interactive": true,
+        "rotationY": "Math.PI * 1.5",
+        "scale": 1,
+        "highlight": true,  
+        "mapX": -13,
+        "mapY": 0,
+        "mapZ": 0,
+        "cameraStartX": -5.892,
+        "cameraStartY": -1.07,
+        "cameraStartZ": 0.967,
+        "cameraStartPitch": 0.03,
+        "cameraStartYaw": -13.21
+    },
+
+
+
+    {
+        "locationid": "SIMFAC",
+        "model": "buildings/simfac.glb",
+        "interactive": true,
+        "mapX": 21,
+        "mapY": 20.5,
+        "mapZ": 0,
+        "rotationY": 3.141593,
+        "scale": 1,
+        "cameraStartY": 15.453,
+        "cameraStartZ": 2.144,
+        "cameraStartX": 17.099,
+        "cameraStartPitch": -0.312,
+        "cameraStartYaw": -8.759
+    },
+
+
+    {
+        "locationid": "SMOGSIDE",
+        "model": "buildings/smogside.glb",
+        "interactive": true,
+        "mapX": 31,
+        "mapY": -36,
+        "mapZ": 0,
+        "rotationY": "Math.PI",
+        "scale": 1,
+        "cameraStartX": 28.292,
+        "cameraStartY": -40.106,
+        "cameraStartZ": 2.009,
+        "cameraStartPitch": -0.413,
+        "cameraStartYaw": -2.6
+    }
+   
+
+]

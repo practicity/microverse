@@ -1,0 +1,155 @@
+[
+    {
+        "name": "Montesori Street North",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapYFrom": 1, 
+        "mapYTo": 50, 
+        "mapX": 0,
+        "mapZ": 0.005,
+        "rotationY": 1.570796,
+        "scale": 1
+    },
+
+    {
+        "name": "I50 North",
+        "model": "infrastructures/transport_road.glb",
+        "mapYFrom": 1, "mapYTo": 50,
+        "mapX": 20.5,
+        "mapZ": 0,
+        "rotationY": 3.141593,
+        "scale": 1
+    },
+
+    {
+        "name": "Airport Street North",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapX": 31,
+        "mapYFrom": 1, "mapYTo": 50,
+        "mapZ": 0.005,
+        "rotationY": 1.570796,
+        "scale": 1
+    },    
+
+    {
+        "name": "Airport Street T junction",
+        "model": "infrastructures/transport_street_t.glb",
+        "mapX": 30 ,
+        "mapY": 0,
+        "mapZ": 0.005,
+        "rotationY": 3.141593,
+        "scale": 1
+    },
+
+    {
+        "name": "Kolb Street West",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapY": 0,
+        "mapXFrom": 0, "mapXTo": 29,
+        "mapZ": 0.005,
+        "rotationY": 3.141593,
+        "scale": 1
+    },
+
+    {
+        "name": "I50 South",
+        "model": "infrastructures/transport_road.glb",
+        "mapYFrom": -49,
+        "mapYTo": -1,
+        "mapX": 20.5,
+        "mapZ": 0,
+        "rotationY": 3.141593,
+        "scale": 1
+    },
+
+
+    {
+        "name": "Airport Street South",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapYFrom": -50, "mapYTo": -1, 
+        "mapX": 31,
+        "mapZ": 0.005,
+        "rotationY": 1.570796,
+        "scale": 1
+    },   
+
+
+    {
+        "name": "I14 EAST",
+        "model": "infrastructures/transport_road.glb",
+        "mapXFrom": 0,
+        "mapXTo": 50,
+        "mapY": -31,
+        "mapZ": 0,
+        "rotationY": "Math.PI/2",
+        "scale": 0.012
+    },
+
+
+    {
+        "name": "Sorrento Street",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapY": -29.5,
+        "mapXFrom": 20.5, "mapXTo": 30.5,
+        "mapZ": 0.005,
+        "rotationY": 3.141593,
+        "scale": 1
+    },
+
+
+    
+    {
+        "name": "Montesori Street South",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapYFrom": -50, "mapYTo": -1, 
+        "mapX": 0,
+        "mapZ": 0.005,
+        "rotationY": 1.570796,
+        "scale": 1
+    },
+    {
+        "name": "Montesori Lights South Left",
+        "model": "infrastructures/transport_street_light.glb",
+        "mapX": -0.95,
+        "mapYFrom": -48.5, "mapYTo": -1,
+        "stepY": 8,
+        "mapZ": 0,
+        "rotationX": 3.141593,
+        "rotationY": 1.570796,
+        "rotationZ": 3.141593,
+        "scale": 0.07
+    },
+    {
+        "name": "Montesori North Lights Right",
+        "model": "infrastructures/transport_street_light.glb",
+        "mapX": -0.05,
+        "mapYFrom": 1, "mapYTo": 50,
+        "stepY": 8,
+        "mapZ": 0,
+        "rotationX": 3.141593,
+        "rotationY": 4.712389,
+        "rotationZ": 3.141593,
+        "scale": 0.07
+    },
+
+
+
+    {
+        "name": "Kolb Street East",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapY": 0,
+        "mapXFrom": -50, "mapXTo": -2,
+        "mapZ": 0.005,
+        "rotationY": 3.141593,
+        "scale": 1
+    },
+    {
+        "name": "Learners' Crossroad",
+        "model": "infrastructures/transport_street_crosswalk.glb",
+        "mapX": 0,
+        "mapY": -1,
+        "mapZ": 0.005,
+        "scale": 1
+    }
+
+
+]

@@ -1,7 +1,8 @@
 // config.local.js  —  local development  (?env=local)
 
+
 // ── CMS CONTENT SERVER ────────────────────────────────────────────────────────────
-export const PRACTICITYCONTENT_BASEURL  = "http://127.0.0.1:4000";
+export const PRACTICITYCONTENT_BASEURL  = "http://localhost:4000";
 export const LOCATIONS_API_URL          = `${PRACTICITYCONTENT_BASEURL}/api/locations.json`;
 
 // ── GRID / MAP ────────────────────────────────────────────────────────────────
@@ -17,9 +18,13 @@ export const FOG_COLOR              = { r: 0.6, g: 0.8, b: 1.0 };
 export const CLEAR_COLOR            = { r: 0.55, g: 0.80, b: 1.0, a: 1 };
 
 // ── CAMERA ───────────────────────────────────────────────────────────────────
-export const CAMERA_START_CELL_X        = 50;
-export const CAMERA_START_CELL_Z        = 50.5;
-export const CAMERA_HEIGHT              = 0.175;
+export const CAMERA_DEFAULT = {
+    cameraStartX:     5.5,
+    cameraStartY:     0.5,
+    cameraStartZ:     0.175,
+    cameraStartPitch: 0,
+    cameraStartYaw:   4.7,
+};
 export const CAMERA_LOOK_AHEAD          = 10;
 export const CAMERA_MIN_Z               = 0.1;
 export const CAMERA_SPEED               = 0.15;
@@ -64,7 +69,7 @@ export const GRID_Y_OFFSET              = 0.01;
 
 // ── GROUND ───────────────────────────────────────────────────────────────────
 export const GROUND_SUBDIVISIONS    = 5;
-export const GROUND_TEXTURE_PATH    = "public/assets/texture_grass.jpg";
+export const GROUND_TEXTURE_PATH    = "public/assets/grounds/texture_grass.jpg";
 export const GROUND_TEXTURE_SCALE   = 1;
 export const GROUND_METALLIC        = 0;
 export const GROUND_ROUGHNESS       = 2;

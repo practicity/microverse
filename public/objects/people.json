@@ -1,0 +1,11 @@
+[
+    {
+        "name": "Neo",
+        "model": "people/character_man1.glb",
+        "mapX": 0, 
+        "mapY": 0,
+        "mapZ": 0,
+        "rotationY": 3.141593,
+        "scale": 1
+    }
+]

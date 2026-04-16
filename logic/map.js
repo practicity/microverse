@@ -17,8 +17,11 @@ import {
     GRID_Y_OFFSET
 } from './config.js';
 
-import { OBJECT_DEFINITIONS } from "../public/objects/objects.js";
 import { createObject } from "./object.js";
+
+// Auto-discover every *.js file in public/objects/ — add a file there and it loads automatically
+const _objectModules = import.meta.glob("../public/objects/*.json", { eager: true });
+const OBJECT_DEFINITIONS = Object.values(_objectModules).flatMap(mod => mod.default ?? mod);
 
 
 
@@ -34,10 +37,10 @@ export class CityMap {
         this.grid  = Array.from({ length: GRID_SIZE }, () => new Array(GRID_SIZE).fill(null));
     }
 
-    build() {
+    build(onProgress) {
         this._buildWorldGrid();
-        this._buildGround();
-        this._buildObjects();
+        this._buildGround(onProgress);
+        this._buildObjects(onProgress);
     }
 
     // ── World Grid ────────────────────────────────────────────────────────────
@@ -48,7 +51,7 @@ export class CityMap {
             height: MAP_WORLD
         }, this.scene);
 
-        this.gridMesh.position.set(MAP_WORLD / 2, GRID_Y_OFFSET, MAP_WORLD / 2);
+        this.gridMesh.position.set(0, GRID_Y_OFFSET, 0);
 
         const gridMaterial = new BABYLON.GridMaterial("gridMaterial", this.scene);
         gridMaterial.majorUnitFrequency  = GRID_MAJOR_UNIT_FREQUENCY;
@@ -71,14 +74,14 @@ export class CityMap {
 
     // ── Ground Plane ──────────────────────────────────────────────────────────
 
-    _buildGround() {
+    _buildGround(onProgress) {
         const ground = BABYLON.MeshBuilder.CreateGround("ground", {
             width:        MAP_WORLD,
             height:       MAP_WORLD,
             subdivisions: GROUND_SUBDIVISIONS
         }, this.scene);
 
-        ground.position.set(MAP_WORLD / 2, 0, MAP_WORLD / 2);
+        ground.position.set(0, 0, 0);
         ground.checkCollisions = true;
         ground.isPickable      = false;
 
@@ -87,6 +90,7 @@ export class CityMap {
         const diffuseTex  = new BABYLON.Texture(GROUND_TEXTURE_PATH, this.scene);
         diffuseTex.uScale = MAP_WORLD / GROUND_TEXTURE_SCALE;
         diffuseTex.vScale = MAP_WORLD / GROUND_TEXTURE_SCALE;
+        diffuseTex.onLoadObservable.addOnce(() => { if (onProgress) onProgress(); });
         gm.albedoTexture  = diffuseTex;
 
         gm.metallic  = GROUND_METALLIC;
@@ -97,10 +101,15 @@ export class CityMap {
 
     // ── Objects ───────────────────────────────────────────────────────────────
 
-    _buildObjects() {
+    // Total items to track: one per definition + one for the ground texture
+    static get loadTotal() {
+        return OBJECT_DEFINITIONS.length + 1;
+    }
+
+    _buildObjects(onProgress) {
         OBJECT_DEFINITIONS.forEach(def => {
             this._markGrid(def.mapX, def.mapY, 1, 1, "object");
-            createObject(def, this.scene);
+            createObject(def, this.scene, () => { if (onProgress) onProgress(); });
         });
     }
 

@@ -10,8 +10,7 @@ const {
     CELL_SIZE,
     GRAVITY, FOG_MODE,
     FOG_START, FOG_END, FOG_COLOR, CLEAR_COLOR,
-    CAMERA_START_CELL_X, CAMERA_START_CELL_Z,
-    CAMERA_HEIGHT, CAMERA_LOOK_AHEAD,
+    CAMERA_DEFAULT, CAMERA_LOOK_AHEAD,
     CAMERA_MIN_Z, CAMERA_SPEED, CAMERA_ANGULAR_SENSIBILITY, CAMERA_ELLIPSOID,
     KEYS_UP, KEYS_DOWN, KEYS_LEFT, KEYS_RIGHT, KEYS_UPWARD, KEYS_DOWNWARD,
     POINTER_LOCK_DELAY,
@@ -36,8 +35,16 @@ import { getLocationStart, syncURLWithPosition } from "./urlParams.js";
 
 // ── DOM ──────────────────────────────────────────────────────────────────────
 
+const loadingScreen       = document.getElementById("loading-screen");
+const loadingBar          = document.getElementById("loading-bar");
+const loadingPct          = document.getElementById("loading-pct");
 const canvas              = document.getElementById("renderCanvas");
-const objectLabel         = document.getElementById("object-label");
+const locator             = document.getElementById("locator");
+const locatorHeader       = document.getElementById("locator-header");
+const locatorObjectName   = document.getElementById("locator-object-name");
+const locatorModelName    = document.getElementById("locator-model-name");
+const locatorCoords       = document.getElementById("locator-coords");
+const locatorCopy         = document.getElementById("locator-copy");
 const popup               = document.getElementById("interaction-popup");
 const popupTitle          = document.getElementById("popup-title");
 const popupTags           = document.getElementById("popup-tags");
@@ -70,6 +77,7 @@ const locationsReady = fetch(LOCATIONS_API_URL)
 const engine = new BABYLON.Engine(canvas, true);
 const scene  = new BABYLON.Scene(engine);
 
+scene.useRightHandedSystem = true;
 scene.fogMode           = FOG_MODE;
 scene.fogStart          = FOG_START;
 scene.fogEnd            = FOG_END;
@@ -81,24 +89,12 @@ scene.collisionsEnabled = true;
 // ── CAMERA ───────────────────────────────────────────────────────────────────
 
 // locationid URL param overrides config defaults
-const { position: startPosition, yaw: startYaw, pitch: startPitch, locationObj } = getLocationStart(
-    CAMERA_START_CELL_X,
-    CAMERA_START_CELL_Z,
-    CAMERA_HEIGHT
-);
+const { position: startPosition, yaw: startYaw, pitch: startPitch, locationObj } = getLocationStart(CAMERA_DEFAULT);
 
 const camera = new BABYLON.UniversalCamera("cam", startPosition, scene);
 
 camera.rotation.y = startYaw;
 camera.rotation.x = startPitch;
-
-if (!locationObj) {
-    camera.setTarget(new BABYLON.Vector3(
-        startPosition.x,
-        startPosition.y,
-        startPosition.z + CAMERA_LOOK_AHEAD
-    ));
-}
 
 camera.minZ               = CAMERA_MIN_Z;
 camera.speed              = CAMERA_SPEED;
@@ -150,7 +146,23 @@ initWeather(scene, sun, ambient, skyMat);
 // ── BUILD THE CITY ───────────────────────────────────────────────────────────
 
 const cityMap = new CityMap(scene);
-cityMap.build();
+
+let loadedCount = 0;
+const loadTotal = CityMap.loadTotal;
+
+cityMap.build(() => {
+    loadedCount++;
+    const pct = Math.round((loadedCount / loadTotal) * 100);
+    loadingBar.style.width = pct + "%";
+    loadingPct.textContent = pct + "%";
+
+    if (loadedCount >= loadTotal) {
+        scene.executeWhenReady(() => {
+            loadingScreen.classList.add("fade-out");
+            loadingScreen.addEventListener("transitionend", () => loadingScreen.remove(), { once: true });
+        });
+    }
+});
 
 // ── GRID TOGGLE ──────────────────────────────────────────────────────────────
 
@@ -192,6 +204,8 @@ let nearbyMesh      = null;
 let prevNearbyMesh  = null;
 let popupOpen       = false;
 let labelEnabled    = false;
+let crosshairMapX   = null;
+let crosshairMapY   = null;
 let autoOpenEnabled = new URLSearchParams(window.location.search).get("popautoopen") === "true";
 
 // Resolve a URL from the API: prefix relative paths with the content base URL
@@ -321,24 +335,35 @@ scene.onBeforeRenderObservable.add(() => {
         camera
     );
 
-    // Label: any named mesh
+    // Crosshair grid position: intersect ray with ground plane (y=0)
+    // Babylon X → mapY, Babylon Z → mapX (matches object.js axis convention)
+    if (ray.direction.y !== 0) {
+        const t = -ray.origin.y / ray.direction.y;
+        if (t > 0) {
+            crosshairMapX = Math.round(ray.origin.z + t * ray.direction.z);
+            crosshairMapY = Math.round(ray.origin.x + t * ray.direction.x);
+        }
+    }
+
+    // Locator header: object name + model when crosshair hits a named mesh
     const labelHit = scene.pickWithRay(
         ray,
         (mesh) => mesh.isPickable && mesh.name && mesh.name !== "" && mesh.name !== "__root__"
     );
 
-    if (labelEnabled && labelHit.hit && labelHit.pickedMesh) {
-        const name = labelHit.pickedMesh.metadata?.objectName
-                  ?? labelHit.pickedMesh.name
-                  ?? "";
+    if (labelHit.hit && labelHit.pickedMesh) {
+        const meta  = labelHit.pickedMesh.metadata ?? {};
+        const name  = meta.objectName || labelHit.pickedMesh.name || "";
+        const model = meta.model || "";
         if (name) {
-            objectLabel.textContent = name;
-            objectLabel.classList.add("visible");
+            locatorObjectName.textContent = name;
+            locatorModelName.textContent  = model;
+            locatorHeader.classList.add("visible");
         } else {
-            objectLabel.classList.remove("visible");
+            locatorHeader.classList.remove("visible");
         }
     } else {
-        objectLabel.classList.remove("visible");
+        locatorHeader.classList.remove("visible");
     }
 
     // Interaction: only interactive meshes
@@ -379,12 +404,50 @@ window.addEventListener("keydown", (e) => {
         return;
     }
 
-    // Label toggle
+    // Locator toggle
     if (e.key.toUpperCase() === LABEL_TOGGLE_KEY || e.code === LABEL_TOGGLE_KEY_CODE) {
         labelEnabled = !labelEnabled;
-        if (!labelEnabled) objectLabel.classList.remove("visible");
+        locator.classList.toggle("visible", labelEnabled);
         return;
     }
+});
+
+// ── LOCATOR ──────────────────────────────────────────────────────────────────
+
+function locatorText() {
+    const x     = camera.position.x;
+    const y     = camera.position.y;   // eye height (Babylon Y)
+    const z     = camera.position.z;
+    const pitch = camera.rotation.x;
+    const yaw   = camera.rotation.y;
+
+    const f = (n, d = 3) => parseFloat(n.toFixed(d));
+
+    const lines = [
+        `"cameraStartX": ${f(z)},`,
+        `"cameraStartY": ${f(x)},`,
+        `"cameraStartZ": ${f(y)},`,
+        `"cameraStartPitch": ${f(pitch)},`,
+        `"cameraStartYaw": ${f(yaw)},`,
+    ];
+
+    if (crosshairMapX !== null) {
+        lines.push(`"mapX": ${crosshairMapX},`);
+        lines.push(`"mapY": ${crosshairMapY},`);
+    }
+
+    return lines.join("\n");
+}
+
+locatorCopy.addEventListener("click", () => {
+    navigator.clipboard.writeText(locatorText()).then(() => {
+        locatorCopy.textContent = "COPIED!";
+        locatorCopy.classList.add("copied");
+        setTimeout(() => {
+            locatorCopy.textContent = "COPY";
+            locatorCopy.classList.remove("copied");
+        }, 1500);
+    });
 });
 
 // ── RENDER LOOP ──────────────────────────────────────────────────────────────
@@ -393,6 +456,7 @@ engine.runRenderLoop(() => {
     scene.render();
     minimap.update(camera.position);
     syncURLWithPosition(camera);
+    locatorCoords.textContent = locatorText();
 });
 
 window.addEventListener("resize", () => engine.resize());
