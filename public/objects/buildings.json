@@ -510,11 +510,11 @@
         "mapZ": 0,
         "rotationY": "Math.PI",
         "scale": 1,
-        "cameraStartX": 28.292,
-        "cameraStartY": -40.106,
-        "cameraStartZ": 2.009,
-        "cameraStartPitch": -0.413,
-        "cameraStartYaw": -2.6
+        "cameraStartX": -0.75,
+        "cameraStartY": -4.154,
+        "cameraStartZ": 0.159,
+        "cameraStartPitch": -0.021,
+        "cameraStartYaw": -3.761
     }
 
 
