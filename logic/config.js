@@ -8,6 +8,9 @@ export const LOCATIONS_API_URL          = `${PRACTICITYCONTENT_BASEURL}/api/loca
 export const GRID_SIZE              =100;
 export const CELL_SIZE              = 1;
 
+// ── COLLISIONS ───────────────────────────────────────────────────────────────
+export const COLLISIONS_ENABLED     = true;
+
 // ── SCENE ────────────────────────────────────────────────────────────────────
 export const GRAVITY                = { x: 0, y: -0.9, z: 0 };
 export const FOG_MODE               = 3;
@@ -26,7 +29,8 @@ export const CAMERA_DEFAULT = {
 };
 export const CAMERA_LOOK_AHEAD          = 10;
 export const CAMERA_MIN_Z               = 0.1;
-export const CAMERA_SPEED               = 0.15;
+export const CAMERA_SPEED_DESKTOP       = 0.15;
+export const CAMERA_SPEED_MOBILE        = 0.15;
 export const CAMERA_ANGULAR_SENSIBILITY = 1500;
 export const CAMERA_ELLIPSOID           = { x: 0.35, y: 0.1, z: 0.35 };
 
@@ -72,3 +76,33 @@ export const GROUND_TEXTURE_PATH    = "assets/grounds/texture_grass.jpg";
 export const GROUND_TEXTURE_SCALE   = 1;
 export const GROUND_METALLIC        = 0;
 export const GROUND_ROUGHNESS       = 2;
+
+// ── WEATHER ───────────────────────────────────────────────────────────────────
+export const WEATHER_API_KEY               = "ab16871ed2f23f9a204a9b7c1c7dd6c0";
+export const WEATHER_LAT                   = 45.7640;   // Lyon, France
+export const WEATHER_LON                   =  4.8357;
+export const WEATHER_REFRESH_MS            = 10 * 60 * 1000;
+
+// ── SUN / MAP ORIENTATION ─────────────────────────────────────────────────────
+//
+// WEATHER_MAP_NORTH_BEARING_DEG: degrees CLOCKWISE from Babylon +Z that points
+// to real-world geographic North.
+//
+//   0   → Babylon +Z  is North  (default)
+//   90  → Babylon +Z  is East   (+X is North)
+//   180 → Babylon +Z  is South
+//   270 → Babylon +Z  is West   (-X is North)
+//
+// Tune until the sun rises on the eastern side of your city.
+export const WEATHER_MAP_NORTH_BEARING_DEG = 110;
+
+// ── CELESTIAL BODY VISUALS ────────────────────────────────────────────────────
+//
+// CEL_BODY_DIST: distance from camera to the sun / moon disc each frame.
+// Must stay strictly inside the skybox (SKYBOX_SIZE / 2 = 100).
+export const CEL_BODY_DIST                 = 90;
+
+// Apparent angular diameters in degrees.
+// The real sun and moon both subtend ~0.5°; these are scaled up for visibility.
+export const SUN_ANGULAR_SIZE_DEG          = 1.5;
+export const MOON_ANGULAR_SIZE_DEG         = 1.3;

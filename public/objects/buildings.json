@@ -469,6 +469,24 @@
 
 
     {
+        "locationid": "RESPAWN",
+        "model": "buildings/respawn.glb",
+        "interactive": true,
+        "rotationY": "Math.PI * 0.5",
+        "scale": 1,
+        "mapX": -10, 
+        "mapY": -1,
+        "mapZ": 0,
+        "cameraStartX": -11.454,
+        "cameraStartY": -0.523,
+        "cameraStartZ": 0.292,
+        "cameraStartPitch": -0.057,
+        "cameraStartYaw": 1.225
+    },
+
+
+
+    {
         "locationid": "SIMFAC",
         "model": "buildings/simfac.glb",
         "interactive": true,

@@ -3,7 +3,7 @@ function resolveAngle(val) {
     return new Function(`return ${val.replace(/Math\.PI/g, '3.141592653589793')}`)();
 }
 
-export function createObject(def, scene, onLoaded) {
+export function createObject(def, scene, collisionsEnabled, onLoaded) {
 
     const positions = [];
 
@@ -35,7 +35,8 @@ export function createObject(def, scene, onLoaded) {
                 const root = new BABYLON.TransformNode(`${def.name}_${x}_${y}`, scene);
                 meshes.forEach(m => {
                     m.parent = root;
-                    m.isPickable = true;  // all meshes pickable for label ray
+                    m.isPickable      = true;  // all meshes pickable for label ray
+                    m.checkCollisions = collisionsEnabled;
                     m.metadata = {
                         ...(m.metadata || {}),
                         locationid:  def.locationid ?? null,

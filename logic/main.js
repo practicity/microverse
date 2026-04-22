@@ -11,9 +11,9 @@ const {
     GRAVITY, FOG_MODE,
     FOG_START, FOG_END, FOG_COLOR, CLEAR_COLOR,
     CAMERA_DEFAULT, CAMERA_LOOK_AHEAD,
-    CAMERA_MIN_Z, CAMERA_SPEED, CAMERA_ANGULAR_SENSIBILITY, CAMERA_ELLIPSOID,
+    CAMERA_MIN_Z, CAMERA_SPEED_DESKTOP, CAMERA_SPEED_MOBILE, CAMERA_ANGULAR_SENSIBILITY, CAMERA_ELLIPSOID,
     KEYS_UP, KEYS_DOWN, KEYS_LEFT, KEYS_RIGHT, KEYS_UPWARD, KEYS_DOWNWARD,
-    POINTER_LOCK_DELAY,
+    POINTER_LOCK_DELAY, COLLISIONS_ENABLED,
     SKYBOX_SIZE,
     FLASHLIGHT_ANGLE, FLASHLIGHT_EXPONENT,
     FLASHLIGHT_INTENSITY, FLASHLIGHT_ENABLED_DEFAULT,
@@ -83,7 +83,7 @@ scene.fogEnd            = FOG_END;
 scene.fogColor          = new BABYLON.Color3(FOG_COLOR.r, FOG_COLOR.g, FOG_COLOR.b);
 scene.clearColor        = new BABYLON.Color4(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, CLEAR_COLOR.a);
 scene.gravity           = new BABYLON.Vector3(GRAVITY.x, GRAVITY.y, GRAVITY.z);
-scene.collisionsEnabled = true;
+scene.collisionsEnabled = COLLISIONS_ENABLED;
 
 // ── CAMERA ───────────────────────────────────────────────────────────────────
 
@@ -96,11 +96,10 @@ camera.rotation.y = startYaw;
 camera.rotation.x = startPitch;
 
 camera.minZ               = CAMERA_MIN_Z;
-camera.speed              = CAMERA_SPEED;
 camera.angularSensibility = CAMERA_ANGULAR_SENSIBILITY;
 camera.ellipsoid          = new BABYLON.Vector3(CAMERA_ELLIPSOID.x, CAMERA_ELLIPSOID.y, CAMERA_ELLIPSOID.z);
 camera.ellipsoidOffset    = new BABYLON.Vector3(0, CAMERA_ELLIPSOID.y, 0);
-camera.checkCollisions    = true;
+camera.checkCollisions    = COLLISIONS_ENABLED;
 camera.applyGravity       = false;
 camera.attachControl(canvas, true);
 canvas.focus();
@@ -112,17 +111,23 @@ camera.keysRight    = KEYS_RIGHT;
 camera.keysUpward   = KEYS_UPWARD;
 camera.keysDownward = KEYS_DOWNWARD;
 
+const isMobile     = window.matchMedia("(pointer: coarse)").matches;
+const CAMERA_SPEED = isMobile ? CAMERA_SPEED_MOBILE : CAMERA_SPEED_DESKTOP;
+camera.speed       = CAMERA_SPEED;
+
 
 
 
 
 // ── POINTER LOCK ─────────────────────────────────────────────────────────────
 
-canvas.addEventListener("click", () => {
-    if (document.pointerLockElement !== canvas) {
-        setTimeout(() => canvas.requestPointerLock(), POINTER_LOCK_DELAY);
-    }
-});
+if (!isMobile) {
+    canvas.addEventListener("click", () => {
+        if (document.pointerLockElement !== canvas) {
+            setTimeout(() => canvas.requestPointerLock(), POINTER_LOCK_DELAY);
+        }
+    });
+}
 
 // ── LIGHTING ─────────────────────────────────────────────────────────────────
 
@@ -140,28 +145,36 @@ skybox.isPickable      = false;
 
 // ── WEATHER ──────────────────────────────────────────────────────────────────
 
-initWeather(scene, sun, ambient, skyMat);
+initWeather(scene, sun, ambient, skyMat, camera);
 
 // ── BUILD THE CITY ───────────────────────────────────────────────────────────
 
 const cityMap = new CityMap(scene);
 
 let loadedCount = 0;
-const loadTotal = CityMap.loadTotal;
+const loadTotal = CityMap.loadTotal + 1; // +1 for locations API data
 
-cityMap.build(() => {
+function onProgress() {
     loadedCount++;
     const pct = Math.round((loadedCount / loadTotal) * 100);
     loadingBar.style.width = pct + "%";
     loadingPct.textContent = pct + "%";
 
     if (loadedCount >= loadTotal) {
-        scene.executeWhenReady(() => {
+        // whenReadyAsync waits for all textures (including GLB-embedded ones) and
+        // shader compilation to complete before revealing the world.
+        scene.whenReadyAsync().then(() => {
+            // Freeze all material shaders — static scene never needs define recompilation.
+            scene.materials.forEach(mat => { if (mat.freeze) mat.freeze(); });
             loadingScreen.classList.add("fade-out");
             loadingScreen.addEventListener("transitionend", () => loadingScreen.remove(), { once: true });
         });
     }
-});
+}
+
+cityMap.build(onProgress);
+// Gate reveal on locations data so interaction names are ready on first approach.
+locationsReady.then(onProgress);
 
 // ── GRID TOGGLE ──────────────────────────────────────────────────────────────
 
@@ -309,8 +322,10 @@ async function openPopup(metadata) {
 function closePopup() {
     popup.classList.remove("visible");
     popupOpen = false;
-    camera.attachControl(canvas, true);
-    canvas.focus();
+    if (!isMobile) {
+        camera.attachControl(canvas, true);
+        canvas.focus();
+    }
 }
 
 popupClose.addEventListener("click", closePopup);
@@ -370,11 +385,13 @@ scene.onBeforeRenderObservable.add(() => {
 
     if (hit.hit && hit.pickedMesh && hit.distance <= INTERACTION_MAX_DISTANCE) {
         nearbyMesh = hit.pickedMesh;
-        const meta = hit.pickedMesh.metadata ?? {};
-        const locData = meta.locationid ? locationsMap.get(meta.locationid) : null;
-        const name = locData?.name ?? meta.objectName ?? "object";
-        interactHint.textContent = `[${INTERACTION_KEY}] Interact with ${name}`;
-        interactHint.classList.add("visible");
+        if (!isMobile) {
+            const meta = hit.pickedMesh.metadata ?? {};
+            const locData = meta.locationid ? locationsMap.get(meta.locationid) : null;
+            const name = locData?.name ?? meta.objectName ?? "object";
+            interactHint.textContent = `[${INTERACTION_KEY}] Interact with ${name}`;
+            interactHint.classList.add("visible");
+        }
 
         if (autoOpenEnabled && nearbyMesh !== prevNearbyMesh) {
             autoOpenEnabled = false;
@@ -382,7 +399,7 @@ scene.onBeforeRenderObservable.add(() => {
         }
     } else {
         nearbyMesh = null;
-        interactHint.classList.remove("visible");
+        if (!isMobile) interactHint.classList.remove("visible");
     }
 
     prevNearbyMesh = nearbyMesh;
@@ -455,3 +472,88 @@ engine.runRenderLoop(() => {
 });
 
 window.addEventListener("resize", () => engine.resize());
+
+// ── MOBILE CONTROLS ──────────────────────────────────────────────────────────
+
+if (isMobile) {
+    camera.detachControl(canvas);
+
+    document.getElementById("ui").style.display = "none";
+    const mobileControls     = document.getElementById("mobile-controls");
+    const mobileInteractBtn  = document.getElementById("mobile-interact-btn");
+    mobileControls.style.display = "flex";
+
+    const mobileInput = {
+        forward: false, backward: false,
+        lookUp: false, lookDown: false,
+        lookLeft: false, lookRight: false,
+    };
+
+    const attachHold = (id, prop) => {
+        const btn = document.getElementById(id);
+        const press   = e => { e.preventDefault(); mobileInput[prop] = true;  btn.classList.add("pressed"); };
+        const release = e => { e.preventDefault(); mobileInput[prop] = false; btn.classList.remove("pressed"); };
+        btn.addEventListener("touchstart",  press,   { passive: false });
+        btn.addEventListener("touchend",    release, { passive: false });
+        btn.addEventListener("touchcancel", release, { passive: false });
+    };
+
+    attachHold("btn-forward",    "forward");
+    attachHold("btn-backward",   "backward");
+    // Touch-drag on canvas for free-look — track by identifier so it works
+    // simultaneously with button touches (multi-touch).
+    let dragId     = null;
+    let touchOrigin = null;
+    canvas.addEventListener("touchstart", e => {
+        if (dragId === null) {
+            const t    = e.changedTouches[0];
+            dragId     = t.identifier;
+            touchOrigin = { x: t.clientX, y: t.clientY };
+        }
+    }, { passive: true });
+    canvas.addEventListener("touchmove", e => {
+        if (dragId === null) return;
+        let t = null;
+        for (let i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === dragId) { t = e.touches[i]; break; }
+        }
+        if (!t) return;
+        const dx = t.clientX - touchOrigin.x;
+        const dy = t.clientY - touchOrigin.y;
+        camera.rotation.y  -= dx * 0.005;
+        camera.rotation.x  -= dy * 0.005;
+        camera.rotation.x   = Math.max(-Math.PI * 0.45, Math.min(Math.PI * 0.45, camera.rotation.x));
+        touchOrigin = { x: t.clientX, y: t.clientY };
+    }, { passive: true });
+    const endDrag = e => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === dragId) { dragId = null; touchOrigin = null; break; }
+        }
+    };
+    canvas.addEventListener("touchend",    endDrag);
+    canvas.addEventListener("touchcancel", endDrag);
+
+    // Interact tap button
+    mobileInteractBtn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        if (!popupOpen && nearbyMesh) openPopup(nearbyMesh.metadata);
+    }, { passive: false });
+
+    // Per-frame mobile movement & interact button visibility
+    scene.onBeforeRenderObservable.add(() => {
+        mobileInteractBtn.style.display = (!popupOpen && nearbyMesh) ? "flex" : "none";
+
+        if (mobileInput.forward || mobileInput.backward) {
+            const sign = mobileInput.forward ? 1 : -1;
+            const dt   = engine.getDeltaTime() / 1000;
+            const fwd  = camera.getForwardRay(1).direction;
+            const spd  = CAMERA_SPEED * 60 * dt;
+            const disp = new BABYLON.Vector3(fwd.x * spd * sign, fwd.y * spd * sign, fwd.z * spd * sign);
+            if (COLLISIONS_ENABLED) {
+                camera._collideWithWorld(disp);
+            } else {
+                camera.position.addInPlace(disp);
+            }
+        }
+    });
+}
