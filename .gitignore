@@ -1,4 +1,2 @@
-*.blend
-*.blend1
 dist/
-native_files
+native_files/
