@@ -44,6 +44,7 @@ const locatorObjectName   = document.getElementById("locator-object-name");
 const locatorModelName    = document.getElementById("locator-model-name");
 const locatorCoords       = document.getElementById("locator-coords");
 const locatorCopy         = document.getElementById("locator-copy");
+const locatorModelSize    = document.getElementById("locator-model-size");
 const popup               = document.getElementById("interaction-popup");
 const popupTitle          = document.getElementById("popup-title");
 const popupTags           = document.getElementById("popup-tags");
@@ -176,11 +177,6 @@ cityMap.build(onProgress);
 // Gate reveal on locations data so interaction names are ready on first approach.
 locationsReady.then(onProgress);
 
-// ── GRID TOGGLE ──────────────────────────────────────────────────────────────
-
-window.addEventListener("keydown", (e) => {
-    if (e.key === "g" || e.key === "G") cityMap.toggleGrid();
-});
 
 // ── FLASHLIGHT ───────────────────────────────────────────────────────────────
 
@@ -369,6 +365,12 @@ scene.onBeforeRenderObservable.add(() => {
         if (name) {
             locatorObjectName.textContent = name;
             locatorModelName.textContent  = model;
+            locatorModelSize.textContent  = glbSizeCache.get(model) ?? "";
+            if (model && !glbSizeCache.has(model)) {
+                fetchGlbSize(model).then(size => {
+                    if (locatorModelName.textContent === model) locatorModelSize.textContent = size;
+                });
+            }
             locatorHeader.classList.add("visible");
         } else {
             locatorHeader.classList.remove("visible");
@@ -411,10 +413,11 @@ canvas.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (e) => {
-    // Locator toggle
+    // Locator + grid toggle
     if (e.key.toUpperCase() === LABEL_TOGGLE_KEY || e.code === LABEL_TOGGLE_KEY_CODE) {
         labelEnabled = !labelEnabled;
         locator.classList.toggle("visible", labelEnabled);
+        cityMap.toggleGrid();
         return;
     }
 });
@@ -446,8 +449,42 @@ function locatorText() {
     return lines.join("\n");
 }
 
+const glbSizeCache = new Map();
+
+async function fetchGlbSize(model) {
+    if (glbSizeCache.has(model)) return glbSizeCache.get(model);
+    try {
+        const res = await fetch(`assets/${model}`, { method: "HEAD" });
+        const bytes = parseInt(res.headers.get("content-length") || "0", 10);
+        const mb = bytes ? (bytes / 1048576).toFixed(2) + " MB" : "";
+        glbSizeCache.set(model, mb);
+        return mb;
+    } catch {
+        glbSizeCache.set(model, "");
+        return "";
+    }
+}
+
+function copyToClipboard(text) {
+    if (navigator.clipboard?.writeText) {
+        return navigator.clipboard.writeText(text).catch(() => execCopy(text));
+    }
+    execCopy(text);
+    return Promise.resolve();
+}
+
+function execCopy(text) {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+}
+
 locatorCopy.addEventListener("click", () => {
-    navigator.clipboard.writeText(locatorText()).then(() => {
+    copyToClipboard(locatorText()).then(() => {
         locatorCopy.textContent = "COPIED!";
         locatorCopy.classList.add("copied");
         setTimeout(() => {

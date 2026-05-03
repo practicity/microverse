@@ -114,6 +114,24 @@
         "cameraStartYaw": 7.129
     },
 
+    {
+        "locationid": "DELISITU",
+        "model": "buildings/delisitu.glb",
+        "interactive": true,
+        "rotationY": "Math.PI",
+        "scale": 1,
+        "mapX": 0,
+        "mapY": 6,
+        "mapZ": 0,
+        "cameraStartX": -0.659,
+        "cameraStartY": 4.073,
+        "cameraStartZ": 0.209,
+        "cameraStartPitch": 0.027,
+        "cameraStartYaw": 3.663
+    },
+
+
+    
 
     {
         "locationid": "DERRICK",
@@ -501,6 +519,25 @@
         "cameraStartPitch": -0.312,
         "cameraStartYaw": -8.759
     },
+
+
+
+    {
+        "locationid": "SONIC",
+        "model": "buildings/sonic.glb",
+        "interactive": true,
+        "mapX": -4,
+        "mapY": 6,
+        "mapZ": 0,
+        "rotationY": "Math.PI/2",
+        "scale": 1,
+        "cameraStartX": 0.196,
+        "cameraStartY": 8.167,
+        "cameraStartZ": 1.25,
+        "cameraStartPitch": -0.305,
+        "cameraStartYaw": 0.581    
+    },
+
 
 
     {

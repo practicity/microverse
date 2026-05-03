@@ -340,6 +340,12 @@ body { overflow: hidden; background: #000; }
     font-size: 11px;
 }
 
+#locator-model-size {
+    color: rgba(168, 255, 120, 0.4);
+    font-size: 10px;
+    margin-top: 1px;
+}
+
 #locator-coords {
     margin: 0 0 8px 0;
     line-height: 1.6;

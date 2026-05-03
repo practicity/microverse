@@ -17,18 +17,76 @@
 
 
 
- 
- 
+
     {
-        "name": "Montesori Street North",
+        "name": "Montesori Street North 2",
         "model": "infrastructures/transport_street_straight.glb",
-        "mapYFrom": 1, 
+        "mapYFrom": 8, 
         "mapYTo": 50, 
         "mapX": 0,
         "mapZ": 0.005,
         "rotationY": 1.570796,
         "scale": 1
     },
+
+
+ 
+ 
+    {
+        "name": "Montesori Street North 1",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapYFrom": 1, 
+        "mapYTo": 6, 
+        "mapX": 0,
+        "mapZ": 0.005,
+        "rotationY": 1.570796,
+        "scale": 1
+    },
+
+
+    {
+        "name": "Art / Montessori Crossroad",
+        "model": "infrastructures/transport_street_crosswalk.glb",
+        "mapX": 0,
+        "mapY": 6,
+        "mapZ": 0.005,
+        "scale": 1
+    },
+
+
+
+    {
+        "name": "Art Street West",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapXFrom": -5, 
+        "mapXTo": -1, 
+        "mapY": 6,
+        "mapZ": 0.005,
+        "rotationY": 0,
+        "scale": 1
+    },
+
+    {
+        "name": "Art Crosswalk",
+        "model": "infrastructures/transport_street_crosswalk.glb",
+        "mapX": -6,
+        "mapY": 6,
+        "mapZ": 0.005,
+        "scale": 1
+    },
+
+    {
+        "name": "Art Street North",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapX": -6, 
+        "mapYFrom": 1,
+        "mapYTo": 6,
+        "mapZ": 0.005,
+        "rotationY": 1.570796,
+        "scale": 1
+    },
+
+
 
     {
         "name": "I50 North",
@@ -151,14 +209,37 @@
 
 
     {
-        "name": "Kolb Street East",
+        "name": "Kolb Street East 2",
         "model": "infrastructures/transport_street_straight.glb",
         "mapY": 0,
-        "mapXFrom": -50, "mapXTo": -2,
+        "mapXFrom": -50, "mapXTo": -8,
         "mapZ": 0.005,
         "rotationY": 3.141593,
         "scale": 1
     },
+
+    {
+        "name": "Kolb / Art Streets T junction",
+        "model": "infrastructures/transport_street_t.glb",
+        "mapX": -6 ,
+        "mapY": 0,
+        "mapZ": 0.005,
+        "rotationY": 1.570796,
+        "scale": 1
+    },
+
+    {
+        "name": "Kolb Street East 1",
+        "model": "infrastructures/transport_street_straight.glb",
+        "mapY": 0,
+        "mapXFrom": -6, "mapXTo": -2,
+        "mapZ": 0.005,
+        "rotationY": 3.141593,
+        "scale": 1
+    },
+
+
+
     {
         "name": "Learners' Crossroad",
         "model": "infrastructures/transport_street_crosswalk.glb",
